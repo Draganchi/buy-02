@@ -7,7 +7,7 @@ pipeline {
   stages {
     stage('Run Tests: User Service') {
       agent {
-        label 'master'
+        label 'main'
       }
       steps {
         dir('user-service') {
@@ -17,7 +17,7 @@ pipeline {
     }
     stage('Run Tests: Product Service') {
       agent {
-        label 'master'
+        label 'main'
       }
       steps {
         dir('product-service') {
@@ -27,7 +27,7 @@ pipeline {
     }
     stage('Run Tests: Media Service') {
       agent {
-        label 'master'
+        label 'main'
       }
       steps {
         dir('media-service') {
@@ -37,7 +37,7 @@ pipeline {
     }
     stage('Run Tests: Order Service') {
       agent {
-        label 'master'
+        label 'main'
       }
       steps {
         dir('order-service') {
@@ -47,7 +47,7 @@ pipeline {
     }
     stage('Run Tests: Angular') {
       agent {
-        label 'master'
+        label 'main'
       }
       steps {
         dir('angular') {
@@ -180,12 +180,12 @@ pipeline {
 
   post {
     success {
-      mail to: 'diogodmm@me.com,ali@protonmail.com',
+      mail to: 'dragana.bjelajac@gritlab.ax',
            subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - SUCCESS",
            body: "The pipeline was a SUCCESS. Check console output at ${env.BUILD_URL} to view the results."
     }
     failure {
-      mail to: 'diogodmm@me.com,ali@protonmail.com',
+      mail to: 'dragana.bjelajac@gritlab.ax',
            subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
            body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
     }
