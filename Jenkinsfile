@@ -7,7 +7,7 @@ pipeline {
   stages {
     stage('Run Tests: User Service') {
       agent {
-        label 'main'
+        label 'master'
       }
       steps {
         dir('user-service') {
@@ -17,7 +17,7 @@ pipeline {
     }
     stage('Run Tests: Product Service') {
       agent {
-        label 'main'
+        label 'master'
       }
       steps {
         dir('product-service') {
@@ -27,7 +27,7 @@ pipeline {
     }
     stage('Run Tests: Media Service') {
       agent {
-        label 'main'
+        label 'master'
       }
       steps {
         dir('media-service') {
@@ -37,7 +37,7 @@ pipeline {
     }
     stage('Run Tests: Order Service') {
       agent {
-        label 'main'
+        label 'master'
       }
       steps {
         dir('order-service') {
@@ -47,7 +47,7 @@ pipeline {
     }
     stage('Run Tests: Angular') {
       agent {
-        label 'main'
+        label 'master'
       }
       steps {
         dir('angular') {
