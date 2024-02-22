@@ -1,7 +1,7 @@
 pipeline {
   agent any
   tools {
-    maven "Maven3.9.6"
+    maven "Maven 3.9.6"
   }
   environment {
     PROJECT_NAME = "buy01"
