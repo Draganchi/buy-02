@@ -1,5 +1,8 @@
 pipeline {
   agent any
+  tools {
+    maven "Maven3.9.6"
+  }
   environment {
     PROJECT_NAME = "buy01"
     PROJECT_VERSION = ""
@@ -57,7 +60,7 @@ pipeline {
                 sh """
                 mvn sonar:sonar \
                 -Dsonar.projectKey=buy-01-user-service \
-                -Dsonar.host.url=http://137.184.239.175:9000 \
+                -Dsonar.host.url=http://146.190.63.24:9000 \
                 -Dsonar.token=$SONAR_AUTH_TOKEN
                 """
               }
@@ -80,7 +83,7 @@ pipeline {
                 sh """
                 mvn sonar:sonar \
                 -Dsonar.projectKey=buy-01-order-service \
-                -Dsonar.host.url=http://137.184.239.175:9000 \
+                -Dsonar.host.url=http://146.190.63.24:9000 \
                 -Dsonar.token=$SONAR_AUTH_TOKEN
                 """
               }
@@ -104,14 +107,14 @@ pipeline {
   }
   post {
     success {
-      mail to: 'dragana.bjelajac@gritlab.ax',
-           subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - SUCCESS",
-           body: "The pipeline was a SUCCESS. Check console output at ${env.BUILD_URL} to view the results."
+      // mail to: 'dragana.jenkins.2024@gritlab.ax',
+         //  subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - SUCCESS",
+           //body: "The pipeline was a SUCCESS. Check console output at ${env.BUILD_URL} to view the results."
     }
     failure {
-      mail to: 'dragana.bjelajac@gritlab.ax',
-           subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
-           body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
+    //  mail to: 'dragana.jenkins.2024@gritlab.ax',
+      //     subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
+        //   body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
     }
   }
 }
