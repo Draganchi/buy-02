@@ -107,14 +107,14 @@ pipeline {
   }
   post {
     success {
-      // mail to: 'dragana.jenkins.2024@gritlab.ax',
-         //  subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - SUCCESS",
-           //body: "The pipeline was a SUCCESS. Check console output at ${env.BUILD_URL} to view the results."
+       mail to: 'dragana.jenkins.2024@gmail.com',
+           subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - SUCCESS",
+           body: "The pipeline was a SUCCESS. Check console output at ${env.BUILD_URL} to view the results."
     }
     failure {
-    //  mail to: 'dragana.jenkins.2024@gritlab.ax',
-      //     subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
-        //   body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
+      mail to: 'dragana.jenkins.2024@gmail.com',
+           subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
+           body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
     }
   }
 }
