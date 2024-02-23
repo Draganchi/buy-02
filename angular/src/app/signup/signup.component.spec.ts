@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
+import { SignupComponent } from './signup.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SignupComponent } from './signup.component';
 import { UserService } from '../service/user.service';
 import { StateService } from '../service/state.service';
 import { Router } from '@angular/router';
@@ -15,37 +15,41 @@ describe('SignupComponent', () => {
   let stateService: StateService;
   let router: Router;
 
-// Inside your beforeEach block or at the top of your test file
- beforeEach(() => {
-  userService = TestBed.inject(UserService);
-  stateService = TestBed.inject(StateService);
-  router = TestBed.inject(Router);
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [SignupComponent],
+      imports: [ReactiveFormsModule, RouterTestingModule, HttpClientTestingModule],
+      providers: [
+        { provide: UserService, useValue: jasmine.createSpyObj('UserService', ['sendSignupRequest', 'sendLoginRequest']) },
+        { provide: StateService, useValue: jasmine.createSpyObj('StateService', ['refreshState']) }
+      ]
+    }).compileComponents();
 
-  // Correct mock for UserService
-  spyOn(userService, 'sendSignupRequest').and.returnValue(of({
-    jwtToken: 'fake-jwt-token',
-    user: {
+    fixture = TestBed.createComponent(SignupComponent);
+    component = fixture.componentInstance;
+    userService = TestBed.inject(UserService);
+    stateService = TestBed.inject(StateService);
+    router = TestBed.inject(Router);
+  });
+
+  beforeEach(() => {
+    // Correct mock for UserService
+    spyOn(userService, 'sendSignupRequest').and.returnValue(of({
       name: 'Test User',
       email: 'test@example.com',
-      password: 'testPassword', // Adjust based on your User interface
+      password: 'testPassword',
       id: '1',
       role: 'CLIENT',
-      // Add any other properties as required by the User interface
-    }
-  }));
+    }));
 
-  // Correct mock for UserService's login method
-  spyOn(userService, 'sendLoginRequest').and.returnValue(of({
-    jwtToken: 'fake-jwt-token',
-    user: {
+    // Correct mock for UserService's login method
+    spyOn(userService, 'sendLoginRequest').and.returnValue(of({
       name: 'Test User',
       email: 'test@example.com',
       id: '1',
       role: 'CLIENT'
-    }
-  }));
-});
-
+    }));
+  });
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -65,34 +69,35 @@ describe('SignupComponent', () => {
     expect(component.formValid).toBeTrue();
   });
 
-it('should submit form and auto-login', () => {
-  const signupRequest = {
-    name: 'Test User',
-    email: 'test@example.com',
-    password: 'password123',
-    confirmPassword: 'password123',
-    role: false // Assuming false maps to 'CLIENT'
-  };
+  it('should submit form and auto-login', () => {
+    const signupRequest = {
+      name: 'Test User',
+      email: 'test@example.com',
+      password: 'password123',
+      confirmPassword: 'password123',
+      role: false // Assuming false maps to 'CLIENT'
+    };
 
-  // Set form values
-  component.registerForm.controls['name'].setValue(signupRequest.name);
-  component.registerForm.controls['email'].setValue(signupRequest.email);
-  component.registerForm.controls['password'].setValue(signupRequest.password);
-  component.registerForm.controls['confirmPassword'].setValue(signupRequest.confirmPassword);
-  component.registerForm.controls['role'].setValue(signupRequest.role);
+    // Set form values
+    component.registerForm.controls['name'].setValue(signupRequest.name);
+    component.registerForm.controls['email'].setValue(signupRequest.email);
+    component.registerForm.controls['password'].setValue(signupRequest.password);
+    component.registerForm.controls['confirmPassword'].setValue(signupRequest.confirmPassword);
+    component.registerForm.controls['role'].setValue(signupRequest.role);
 
-  // Spy on the StateService and Router methods
-  const stateServiceSpy = spyOn(stateService, 'refreshState').and.callThrough();
-  const routerSpy = spyOn(router, 'navigate');
+    // Spy on the StateService and Router methods
+    const stateServiceSpy = spyOn(stateService, 'refreshState').and.callThrough();
+    const routerSpy = spyOn(router, 'navigate');
 
-  component.onSubmit();
+    component.onSubmit();
 
-  // Verify service calls
-  expect(userService.sendSignupRequest).toHaveBeenCalledWith(jasmine.objectContaining({ role: 'CLIENT' }));
-  expect(userService.sendLoginRequest).toHaveBeenCalledWith(jasmine.objectContaining({ role: 'CLIENT' }));
+    // Verify service calls
+    expect(userService.sendSignupRequest).toHaveBeenCalledWith(jasmine.objectContaining({ role: 'CLIENT' }));
+    expect(userService.sendLoginRequest).toHaveBeenCalledWith(jasmine.objectContaining({ role: 'CLIENT' }));
 
-  // Verify navigation
-  expect(routerSpy).toHaveBeenCalledWith(['home'], jasmine.any(Object));
+    // Verify navigation
+    expect(routerSpy).toHaveBeenCalledWith(['home'], jasmine.any(Object));
+  });
 });
 
 
