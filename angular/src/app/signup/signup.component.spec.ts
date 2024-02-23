@@ -74,12 +74,11 @@ describe('SignupComponent', () => {
 
   it('submitting a valid form', () => {
      spyOn(userService, 'sendLoginRequest').and.returnValue(of({ 
-     jwtToken: 'fake-jwt-token', 
-     user: {
-     name: 'Test User',
-     email: 'test@example.com',
-     id: '1',
-     role: 'User'
+      name: 'Test User',
+      email: 'testuser@example.com',
+      id: 'user-id',
+      role: 'UserRole',
+      jwtToken: 'fake-jwt-token',
      }
     }));
     spyOn(userService, 'sendSignupRequest').and.returnValue(of({
@@ -87,7 +86,6 @@ describe('SignupComponent', () => {
      email: 'newuser@example.com',
      id: '2',
      role: 'Client',
-     jwtToken: 'fake-jwt-token'
     }));
     spyOn(stateService, 'refreshState').and.callThrough();
     const navigateSpy = spyOn(router, 'navigate');
