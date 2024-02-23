@@ -78,12 +78,13 @@ describe('SignupComponent', () => {
       password: 'testPassword'
      }
     }));
-    spyOn(userService, 'sendSignupRequest').and.returnValue(of({
-     name: 'New User',
-     email: 'newuser@example.com',
-     password:'123456',
-     role: 'Client'
-    }));
+   spyOn(userService, 'sendSignupRequest').and.returnValue(of({
+  name: 'New User',
+  email: 'newuser@example.com',
+  password: '123456', // Note: Real responses wouldn't include a password
+  id: 'newUserId',
+  role: 'CLIENT' // Adjust based on your test scenario
+}));
     spyOn(stateService, 'refreshState').and.callThrough();
     const navigateSpy = spyOn(router, 'navigate');
 
