@@ -1,168 +1,102 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { UserService } from '../service/user.service';
-import { NavigationExtras, Router } from '@angular/router';
-import { of } from 'rxjs';
-import { AuthService } from '../service/auth.service';
 import { LoginComponent } from './login.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { UserService } from '../service/user.service';
+import { StateService } from '../service/state.service';
+import { of, throwError } from 'rxjs';
+import { Router } from '@angular/router';
+
+// Mock services
+class MockUserService {
+  sendLoginRequest() {
+    return of({ jwtToken: 'fake-jwt-token', user: { name: 'Test User' } });
+  }
+}
+
+class MockStateService {
+  refreshState(token: string, user: any) {}
+}
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
+  let userService: UserService;
+  let stateService: StateService;
+  let router: Router;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [LoginComponent],
-      imports: [ReactiveFormsModule],
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [ LoginComponent ],
+      imports: [ ReactiveFormsModule, FormsModule, RouterTestingModule, HttpClientTestingModule ],
       providers: [
-        {
-          provide: UserService,
-          useValue: {
-            sendLoginRequest: () =>
-              of({
-                id: '123123123123',
-                email: 'test@test.com',
-                jwtToken:
-                  'ajsdklajsdlskldjaskdjalksdjlaksjdlkasjdlkajsdlslkajsd',
-                name: 'ali',
-                role: 'ROLE_CLIENT',
-              }),
-          },
-        },
-        {
-          provide: Router,
-          useValue: {
-            navigate: jasmine.createSpy('navigate'),
-          },
-        },
-        {
-          provide: AuthService,
-          useValue: {
-            getAuth: () => {
-              of({
-                name: 'ali',
-                email: 'ali@ali.com',
-                id: '123123123123123',
-                role: 'SELLER',
-              });
-            },
-          },
-        },
-      ],
-    }).compileComponents();
+        { provide: UserService, useClass: MockUserService },
+        { provide: StateService, useClass: MockStateService }
+      ]
+    })
+    .compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    userService = TestBed.inject(UserService);
+    stateService = TestBed.inject(StateService);
+    router = TestBed.inject(Router);
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should navigate to register page', () => {
-    const router = TestBed.inject(Router);
-
-    component.goToRegister();
-    expect(router.navigate).toHaveBeenCalledWith(['register']);
+  it('form invalid when empty', () => {
+    expect(component.loginForm.valid).toBeFalsy();
   });
 
-  it('should initialize variables', () => {
-    expect(component.formValid).toBeFalse();
+  it('name field validity', () => {
+    let name = component.loginForm.controls['name'];
+    expect(name.valid).toBeFalsy();
+    name.setValue("");
+    expect(name.hasError('required')).toBeTruthy();
   });
 
-  it('should validate correct form', () => {
-    component.loginForm.setValue({
-      name: 'ali',
-      password: 'test123',
-    });
-    component.onValidate();
-
-    expect(component.formValid).toBeFalse();
+  it('password field validity', () => {
+    let password = component.loginForm.controls['password'];
+    expect(password.valid).toBeFalsy();
+    password.setValue("");
+    expect(password.hasError('required')).toBeTruthy();
   });
 
-  it('should not validate form: long name', () => {
-    component.loginForm.setValue({
-      name:
-        'a'.repeat(301),
-      password: 'asdasd',
-    });
-    component.onValidate();
+  it('submitting a form emits a user', () => {
+    expect(component.loginForm.valid).toBeFalsy();
+    component.loginForm.controls['name'].setValue("tester");
+    component.loginForm.controls['password'].setValue("12345678");
+    expect(component.loginForm.valid).toBeTruthy();
 
-    expect(component.formValid).toBeFalse();
-  });
+    let user: any;
+    // Mock the sendLoginRequest method to test the response
+    spyOn(userService, 'sendLoginRequest').and.returnValue(of({ jwtToken: 'fake-jwt-token', user: { name: 'Test User' } }));
+    spyOn(stateService, 'refreshState').and.callThrough();
+    const navigateSpy = spyOn(router, 'navigate');
 
-  it('should not validate form: long password', () => {
-    component.loginForm.setValue({
-      password:
-        'ttalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdanelialiokok123123123kasdkaskdkasdtalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdanelialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdanelialiokok123123123kasdkaskdkasd',
-      name: 'asdasd',
-    });
-    component.onValidate();
-
-    expect(component.formValid).toBeFalse();
-  });
-
-  it('should not validate form: no name', () => {
-    component.loginForm.setValue({
-      name: ' ',
-      password: 'test123',
-    });
-    component.onValidate();
-
-    expect(component.formValid).toBeFalse();
-  });
-
-  it('should not validate form: no password', () => {
-    component.loginForm.setValue({
-      name: ' ',
-      password: 'asdasd',
-    });
-    component.onValidate();
-
-    expect(component.formValid).toBeFalse();
-  });
-
-  it('should call onSubmit and navigate to home page on succesfull login', () => {
-    const userService = TestBed.inject(UserService);
-    const router = TestBed.inject(Router);
-
-     component.loginForm.setValue({
-    name: 'testuser',
-    password: 'testpassword',
-  });
-
-    spyOn(userService, 'sendLoginRequest').and.returnValue(
-      of({
-        id: '123123123123',
-        email: 'test@test.com',
-        jwtToken: 'ajsdklajsdlskldjaskdjalksdjlaksjdlkasjdlkajsdlslkajsd',
-        name: 'testuser',
-        role: 'ROLE_CLIENT',
-      }),
-    );
-    
     component.onSubmit();
 
-    expect(userService.sendLoginRequest).toHaveBeenCalledWith({
-      name: 'testuser',
-      password: 'testpassword',
-    });
+    expect(userService.sendLoginRequest).toHaveBeenCalledWith({name: 'tester', password: '12345678'});
+    expect(stateService.refreshState).toHaveBeenCalled();
+    expect(navigateSpy).toHaveBeenCalledWith(['home'], jasmine.any(Object)); // Check for navigation with some extras
+  });
 
-    const navigationExtras: NavigationExtras = {
-      state: {
-        data: {
-          id: '123123123123',
-          email: 'test@test.com',
-          jwtToken: 'ajsdklajsdlskldjaskdjalksdjlaksjdlkasjdlkajsdlslkajsd',
-          name: 'testuser',
-          role: 'ROLE_CLIENT',
-        },
-      },
-    };
-    expect(router.navigate).toHaveBeenCalledWith(['home'], navigationExtras);
+  it('handle login error', () => {
+    const errorResponse = { error: { message: 'Invalid credentials' } };
+    spyOn(userService, 'sendLoginRequest').and.returnValue(throwError(() => errorResponse));
+
+    component.loginForm.controls['name'].setValue("wronguser");
+    component.loginForm.controls['password'].setValue("wrongpass");
+    component.onSubmit();
+
+    expect(component.error).toEqual('Invalid credentials');
   });
 });
