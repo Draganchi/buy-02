@@ -86,7 +86,7 @@ describe('LoginComponent', () => {
   it('should not validate form: long name', () => {
     component.loginForm.setValue({
       name:
-        'ttalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdanelialiokok123123123kasdkaskdkasdtalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdanelialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdalialiokok123123123kasdkaskdkasdanelialiokok123123123kasdkaskdkasd',
+        'a'.repeat(301),
       password: 'asdasd',
     });
     component.onValidate();
@@ -129,6 +129,11 @@ describe('LoginComponent', () => {
     const userService = TestBed.inject(UserService);
     const router = TestBed.inject(Router);
 
+     component.loginForm.setValue({
+    name: 'testuser',
+    password: 'testpassword',
+  });
+
     spyOn(userService, 'sendLoginRequest').and.returnValue(
       of({
         id: '123123123123',
@@ -138,11 +143,7 @@ describe('LoginComponent', () => {
         role: 'ROLE_CLIENT',
       }),
     );
-
-    component.loginForm.setValue({
-      name: 'testuser',
-      password: 'testpassword',
-    });
+    
     component.onSubmit();
 
     expect(userService.sendLoginRequest).toHaveBeenCalledWith({
@@ -156,7 +157,7 @@ describe('LoginComponent', () => {
           id: '123123123123',
           email: 'test@test.com',
           jwtToken: 'ajsdklajsdlskldjaskdjalksdjlaksjdlkasjdlkajsdlslkajsd',
-          name: 'ali',
+          name: 'testuser',
           role: 'ROLE_CLIENT',
         },
       },
