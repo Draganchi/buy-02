@@ -11,10 +11,24 @@ import { Router } from '@angular/router';
 // Mock services
 class MockUserService {
   sendSignupRequest(request: any) {
-    return of(null); // Simulate successful signup
+    return of({
+      name: 'New User',
+      email: 'newuser@example.com',
+      password: '123456', // Note: Real responses wouldn't include a password
+      id: 'newUserId',
+      role: 'CLIENT' // Adjust based on your test scenario
+    });
   }
   sendLoginRequest(request: any) {
-    return of({ jwtToken: 'fake-jwt-token', user: { name: 'Test User' } }); // Simulate successful login
+    return of({
+      jwtToken: 'fake-jwt-token',
+      user: {
+        name: 'Test User',
+        email: 'test@example.com', // Include email as required by the User interface
+        id: '1', // Include id as required by the User interface
+        role: 'CLIENT' // Include role as required by the User interface
+      }
+    });
   }
 }
 
