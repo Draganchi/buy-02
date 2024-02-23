@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { SignupComponent } from './signup.component';
 import { UserService } from '../service/user.service';
 import { of } from 'rxjs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('SignupComponent', () => {
   let component: SignupComponent;
