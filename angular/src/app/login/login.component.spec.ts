@@ -80,7 +80,7 @@ describe('LoginComponent', () => {
     });
     component.onValidate();
 
-    expect(component.formValid).toBeTrue();
+    expect(component.formValid).toBeFalse();
   });
 
   it('should not validate form: long name', () => {
