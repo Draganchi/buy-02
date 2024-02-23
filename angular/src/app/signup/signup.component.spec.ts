@@ -73,20 +73,21 @@ describe('SignupComponent', () => {
   });
 
   it('submitting a valid form', () => {
+     spyOn(userService, 'sendLoginRequest').and.returnValue(of({ 
+     jwtToken: 'fake-jwt-token', 
+     user: {
+     name: 'Test User',
+     email: 'test@example.com',
+     id: '1',
+     role: 'User'
+     }
+    }));
     spyOn(userService, 'sendSignupRequest').and.returnValue(of({
      name: 'New User',
      email: 'newuser@example.com',
-     id: 2,
-     role: 'Client' 
-    }));
-    spyOn(userService, 'sendLoginRequest').and.returnValue(of({ 
-      jwtToken: 'fake-jwt-token', 
-      user: {
-      name: 'Test User',
-      email: 'test@example.com',
-      id: 1,
-      role: 'Client'
-      }
+     id: '2',
+     role: 'Client',
+     jwtToken: 'fake-jwt-token'
     }));
     spyOn(stateService, 'refreshState').and.callThrough();
     const navigateSpy = spyOn(router, 'navigate');
