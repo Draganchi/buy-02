@@ -5,6 +5,7 @@ import { NavigationExtras, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { AuthService } from '../service/auth.service';
 import { LoginComponent } from './login.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
