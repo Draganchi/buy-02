@@ -12,18 +12,19 @@ describe('SignupComponent', () => {
   let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
+    // Setup spies for UserService and Router
     mockUserService = jasmine.createSpyObj('UserService', ['sendSignupRequest', 'sendLoginRequest']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
-     mockUserService.sendSignupRequest.and.returnValue(of({
+    // Adjust the mock to return realistic data
+    mockUserService.sendSignupRequest.and.returnValue(of({
+      id: '123123123', // Assume your service returns an object with an 'id'
       name: 'john',
-      email: 'jonh@gmail.com',
-      password: 'test123', // This field is usually not returned by signup APIs
-      confirmPassword: 'test123', // This field is usually not returned by signup APIs
-      role: 'SELLER',
-      id: '123123123', // Include the `id` to match the User interface
+      email: 'john@gmail.com',
+      role: 'SELLER', // No password or confirmPassword fields should be returned
     }));
-    
+
+    // Configure the testing module as usual
     await TestBed.configureTestingModule({
       declarations: [ SignupComponent ],
       imports: [ ReactiveFormsModule ],
@@ -50,34 +51,35 @@ describe('SignupComponent', () => {
       email: 'john@example.com',
       password: '123456',
       confirmPassword: '123456',
-      role: false,
+      role: false, // Assuming this boolean is correctly transformed in your component logic
     });
     expect(component.registerForm.valid).toBeTrue();
   });
 
   it('should call sendSignupRequest and navigate on successful signup', () => {
-    const user = {
+    // Set the form values directly, mimicking user input
+    component.registerForm.setValue({
       name: 'John Doe',
       email: 'john@example.com',
       password: '123456',
       confirmPassword: '123456',
-      role: 'CLIENT',
-    };
-    mockUserService.sendSignupRequest.and.returnValue(of(user));
+      role: false, // Again, assuming conversion logic in your component
+    });
 
-    component.registerForm.setValue(user);
+    // Simulate form submission
     component.onSubmit();
 
-    expect(mockUserService.sendSignupRequest).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: user.name,
-      email: user.email,
-      password: user.password,
-      role: 'CLIENT', // Ensure this matches your component's expected behavior
-    }));
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['home'], jasmine.any(Object));
+    // Check if the service was called with correctly transformed data
+    expect(mockUserService.sendSignupRequest).toHaveBeenCalledWith({
+      name: 'John Doe',
+      email: 'john@example.com',
+      password: '123456',
+      role: 'CLIENT', // Expected role after boolean to role conversion
+    });
+
+    // Verify navigation was called
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['home']);
   });
 
-  // Additional tests here...
-
+  // Add more tests as needed...
 });
-
