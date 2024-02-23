@@ -81,10 +81,12 @@ describe('SignupComponent', () => {
     }));
     spyOn(userService, 'sendLoginRequest').and.returnValue(of({ 
       jwtToken: 'fake-jwt-token', 
+      user: {
       name: 'Test User',
       email: 'test@example.com',
       id: 1,
       role: 'Client'
+      }
     }));
     spyOn(stateService, 'refreshState').and.callThrough();
     const navigateSpy = spyOn(router, 'navigate');
