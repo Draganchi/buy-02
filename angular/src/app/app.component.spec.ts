@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { AppComponent } from './app.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 
 describe('AppComponent', () => {
   //eslint-disable-next-line
