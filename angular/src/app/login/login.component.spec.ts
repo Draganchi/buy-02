@@ -78,7 +78,11 @@ describe('LoginComponent', () => {
 
     let user: any;
     // Mock the sendLoginRequest method to test the response
-    spyOn(userService, 'sendLoginRequest').and.returnValue(of({ jwtToken: 'fake-jwt-token', user: { name: 'Test User' } }));
+    spyOn(userService, 'sendLoginRequest').and.returnValue(of({
+  jwtToken: 'fake-jwt-token',
+  user: { name: 'Test User', email: 'test@example.com', id: '1', role: 'CLIENT' }
+}));
+
     spyOn(stateService, 'refreshState').and.callThrough();
     const navigateSpy = spyOn(router, 'navigate');
 
