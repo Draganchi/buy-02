@@ -15,6 +15,15 @@ describe('SignupComponent', () => {
     mockUserService = jasmine.createSpyObj('UserService', ['sendSignupRequest', 'sendLoginRequest']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
+     mockUserService.sendSignupRequest.and.returnValue(of({
+      name: 'john',
+      email: 'jonh@gmail.com',
+      password: 'test123', // This field is usually not returned by signup APIs
+      confirmPassword: 'test123', // This field is usually not returned by signup APIs
+      role: 'SELLER',
+      id: '123123123', // Include the `id` to match the User interface
+    }));
+    
     await TestBed.configureTestingModule({
       declarations: [ SignupComponent ],
       imports: [ ReactiveFormsModule ],
