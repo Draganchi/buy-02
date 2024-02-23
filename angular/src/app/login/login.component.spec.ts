@@ -139,7 +139,7 @@ describe('LoginComponent', () => {
         id: '123123123123',
         email: 'test@test.com',
         jwtToken: 'ajsdklajsdlskldjaskdjalksdjlaksjdlkasjdlkajsdlslkajsd',
-        name: 'ali',
+        name: 'testuser',
         role: 'ROLE_CLIENT',
       }),
     );
