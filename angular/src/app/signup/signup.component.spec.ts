@@ -88,8 +88,13 @@ describe('SignupComponent', () => {
 
   it('submitting a valid form', () => {
      spyOn(userService, 'sendLoginRequest').and.returnValue(of({ 
-      name: 'Test User',
-      password: 'testPassword'
+       jwtToken: 'fake-jwt-token',
+        user: {
+        name: 'Test User',
+        email: 'test@example.com', // Include email as required by the User interface
+        id: '1', // Include id as required by the User interface
+        role: 'CLIENT' // Include role as required by the User interface
+      }
      }
     }));
    spyOn(userService, 'sendSignupRequest').and.returnValue(of({
