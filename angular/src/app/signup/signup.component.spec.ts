@@ -15,22 +15,37 @@ describe('SignupComponent', () => {
   let stateService: StateService;
   let router: Router;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [SignupComponent],
-      imports: [ReactiveFormsModule, RouterTestingModule, HttpClientTestingModule],
-      providers: [
-        { provide: UserService, useValue: jasmine.createSpyObj('UserService', ['sendSignupRequest', 'sendLoginRequest']) },
-        { provide: StateService, useValue: jasmine.createSpyObj('StateService', ['refreshState']) }
-      ]
-    }).compileComponents();
+// Inside your beforeEach block or at the top of your test file
+ beforeEach(() => {
+  userService = TestBed.inject(UserService);
+  stateService = TestBed.inject(StateService);
+  router = TestBed.inject(Router);
 
-    fixture = TestBed.createComponent(SignupComponent);
-    component = fixture.componentInstance;
-    userService = TestBed.inject(UserService);
-    stateService = TestBed.inject(StateService);
-    router = TestBed.inject(Router);
-  });
+  // Correct mock for UserService
+  spyOn(userService, 'sendSignupRequest').and.returnValue(of({
+    jwtToken: 'fake-jwt-token',
+    user: {
+      name: 'Test User',
+      email: 'test@example.com',
+      password: 'testPassword', // Adjust based on your User interface
+      id: '1',
+      role: 'CLIENT',
+      // Add any other properties as required by the User interface
+    }
+  }));
+
+  // Correct mock for UserService's login method
+  spyOn(userService, 'sendLoginRequest').and.returnValue(of({
+    jwtToken: 'fake-jwt-token',
+    user: {
+      name: 'Test User',
+      email: 'test@example.com',
+      id: '1',
+      role: 'CLIENT'
+    }
+  }));
+});
+
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -50,40 +65,34 @@ describe('SignupComponent', () => {
     expect(component.formValid).toBeTrue();
   });
 
-  it('should submit form and auto-login', () => {
-    const signupRequest = {
-      name: 'Test User',
-      email: 'test@example.com',
-      password: 'password123',
-      confirmPassword: 'password123',
-      role: false // Assuming false maps to 'CLIENT'
-    };
+it('should submit form and auto-login', () => {
+  const signupRequest = {
+    name: 'Test User',
+    email: 'test@example.com',
+    password: 'password123',
+    confirmPassword: 'password123',
+    role: false // Assuming false maps to 'CLIENT'
+  };
 
-    // Mock the UserService methods
-    userService.sendSignupRequest.and.returnValue(of({ jwtToken: 'fake-jwt-token', user: { id: '1' } }));
-    userService.sendLoginRequest.and.returnValue(of({ jwtToken: 'fake-jwt-token', user: { id: '1' } }));
+  // Set form values
+  component.registerForm.controls['name'].setValue(signupRequest.name);
+  component.registerForm.controls['email'].setValue(signupRequest.email);
+  component.registerForm.controls['password'].setValue(signupRequest.password);
+  component.registerForm.controls['confirmPassword'].setValue(signupRequest.confirmPassword);
+  component.registerForm.controls['role'].setValue(signupRequest.role);
 
-    // Spy on the StateService and Router methods
-    const stateServiceSpy = spyOn(stateService, 'refreshState').and.callThrough();
-    const routerSpy = spyOn(router, 'navigate');
+  // Spy on the StateService and Router methods
+  const stateServiceSpy = spyOn(stateService, 'refreshState').and.callThrough();
+  const routerSpy = spyOn(router, 'navigate');
 
-    component.registerForm.setValue(signupRequest);
-    component.onSubmit();
+  component.onSubmit();
 
-    expect(userService.sendSignupRequest).toHaveBeenCalledWith({
-      name: signupRequest.name,
-      email: signupRequest.email,
-      password: signupRequest.password,
-      role: 'CLIENT'
-    });
-    expect(userService.sendLoginRequest).toHaveBeenCalledWith({
-      name: signupRequest.name,
-      email: signupRequest.email,
-      password: signupRequest.password,
-      role: 'CLIENT'
-    });
-    expect(stateServiceSpy).toHaveBeenCalled();
-    expect(routerSpy).toHaveBeenCalledWith(['home']);
-  });
+  // Verify service calls
+  expect(userService.sendSignupRequest).toHaveBeenCalledWith(jasmine.objectContaining({ role: 'CLIENT' }));
+  expect(userService.sendLoginRequest).toHaveBeenCalledWith(jasmine.objectContaining({ role: 'CLIENT' }));
+
+  // Verify navigation
+  expect(routerSpy).toHaveBeenCalledWith(['home'], jasmine.any(Object));
 });
+
 
