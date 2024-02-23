@@ -1,127 +1,84 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SignupComponent } from './signup.component';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SignupComponent } from './signup.component';
 import { UserService } from '../service/user.service';
 import { StateService } from '../service/state.service';
-import { of, throwError } from 'rxjs';
-import { Router } from '@angular/router';
-
-// Mock services
-class MockUserService {
-  sendSignupRequest(request: any) {
-    return of({
-      name: 'New User',
-      email: 'newuser@example.com',
-      password: '123456', // Note: Real responses wouldn't include a password
-      id: 'newUserId',
-      role: 'CLIENT' // Adjust based on your test scenario
-    });
-  }
-  sendLoginRequest(request: any) {
-    return of({
-      jwtToken: 'fake-jwt-token',
-      user: {
-        name: 'Test User',
-        email: 'test@example.com', // Include email as required by the User interface
-        id: '1', // Include id as required by the User interface
-        role: 'CLIENT' // Include role as required by the User interface
-      }
-    });
-  }
-}
-
-class MockStateService {
-  refreshState(token: string, user: any) {}
-}
+import { of } from 'rxjs';
 
 describe('SignupComponent', () => {
   let component: SignupComponent;
   let fixture: ComponentFixture<SignupComponent>;
   let userService: UserService;
   let stateService: StateService;
-  let router: Router;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [SignupComponent],
-      imports: [ReactiveFormsModule, FormsModule, RouterTestingModule, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, RouterTestingModule],
       providers: [
-        { provide: UserService, useClass: MockUserService },
-        { provide: StateService, useClass: MockStateService }
+        { provide: UserService, useValue: jasmine.createSpyObj('UserService', ['sendSignupRequest', 'sendLoginRequest']) },
+        { provide: StateService, useValue: jasmine.createSpyObj('StateService', ['refreshState']) }
       ]
-    })
-    .compileComponents();
-  });
+    }).compileComponents();
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(SignupComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
-
     userService = TestBed.inject(UserService);
     stateService = TestBed.inject(StateService);
-    router = TestBed.inject(Router);
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('form invalid when empty', () => {
-    expect(component.registerForm.valid).toBeFalsy();
+  // Additional tests will go here
+});
+it('should be invalid when empty', () => {
+  expect(component.registerForm.valid).toBeFalsy();
+});
+
+it('should be valid when filled out correctly', () => {
+  component.registerForm.controls['name'].setValue('Test User');
+  component.registerForm.controls['email'].setValue('test@example.com');
+  component.registerForm.controls['password'].setValue('password123');
+  component.registerForm.controls['confirmPassword'].setValue('password123');
+  component.registerForm.controls['role'].setValue(false); // Assuming false maps to 'CLIENT'
+  component.onValidate();
+  expect(component.formValid).toBeTrue();
+});
+it('should submit form and auto-login', () => {
+  const signupRequest = {
+    name: 'Test User',
+    email: 'test@example.com',
+    password: 'password123',
+    confirmPassword: 'password123',
+    role: false // Assuming false maps to 'CLIENT'
+  };
+
+  // Mock the UserService methods
+  userService.sendSignupRequest.and.returnValue(of({ jwtToken: 'fake-jwt-token', user: { id: '1' } }));
+  userService.sendLoginRequest.and.returnValue(of({ jwtToken: 'fake-jwt-token', user: { id: '1' } }));
+
+  // Spy on the StateService and Router methods
+  const stateServiceSpy = spyOn(stateService, 'refreshState').and.callThrough();
+  const routerSpy = spyOn(component.router, 'navigate');
+
+  component.registerForm.setValue(signupRequest);
+  component.onSubmit();
+
+  expect(userService.sendSignupRequest).toHaveBeenCalledWith({
+    name: signupRequest.name,
+    email: signupRequest.email,
+    password: signupRequest.password,
+    role: 'CLIENT'
   });
-
-  // Add more tests here to check for form validity, field errors, and custom validator
-  // For example, checking the password and confirmPassword fields match
-
-  it('passwords match validator', () => {
-    let password = component.registerForm.controls['password'];
-    let confirmPassword = component.registerForm.controls['confirmPassword'];
-    password.setValue('123456');
-    confirmPassword.setValue('123456');
-    // Trigger the custom validator
-    component.registerForm.updateValueAndValidity();
-    expect(component.registerForm.errors?.['notSame']).toBeUndefined();
+  expect(userService.sendLoginRequest).toHaveBeenCalledWith({
+    name: signupRequest.name,
+    email: signupRequest.email,
+    password: signupRequest.password,
+    role: 'CLIENT'
   });
-
-  it('submitting a valid form', () => {
-     spyOn(userService, 'sendLoginRequest').and.returnValue(of({ 
-        user: {
-        name: 'Test User',
-        email: 'test@example.com', // Include email as required by the User interface
-        id: '1', // Include id as required by the User interface
-        role: 'CLIENT',
-        jwtToken: 'fake-jwt-token',
-      }
-     }
-    }));
-   spyOn(userService, 'sendSignupRequest').and.returnValue(of({
-  name: 'New User',
-  email: 'newuser@example.com',
-  password: '123456', // Note: Real responses wouldn't include a password
-  id: 'newUserId',
-  role: 'CLIENT' // Adjust based on your test scenario
-}));
-    spyOn(stateService, 'refreshState').and.callThrough();
-    const navigateSpy = spyOn(router, 'navigate');
-
-    component.registerForm.controls['name'].setValue('testuser');
-    component.registerForm.controls['email'].setValue('test@example.com');
-    component.registerForm.controls['password'].setValue('123456');
-    component.registerForm.controls['confirmPassword'].setValue('123456');
-    component.registerForm.controls['role'].setValue(true); // Assuming true maps to 'SELLER'
-    component.onSubmit();
-
-    // Verify that the signup request was made with the correct role
-    expect(userService.sendSignupRequest).toHaveBeenCalledWith(jasmine.objectContaining({ role: 'SELLER' }));
-    // Verify that after signup, an automatic login attempt is made
-    expect(userService.sendLoginRequest).toHaveBeenCalledTimes(1);
-    // Check if the navigation to the 'home' route was triggered
-    expect(navigateSpy).toHaveBeenCalledWith(['home'], jasmine.any(Object));
-  });
-
-  // You can add more tests to simulate and verify form submission errors, 
-  // checking if the error message is set correctly, etc.
+  expect(stateServiceSpy).toHaveBeenCalled();
+  expect(routerSpy).toHaveBeenCalledWith(['home']);
 });
