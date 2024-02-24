@@ -8,7 +8,9 @@ pipeline {
     PROJECT_NAME = 'buy01'
     // PROJECT_VERSION will be dynamically set within a stage
   }
-  stage('SonarQube Analysis') {
+  
+  stages {
+    stage('SonarQube Analysis') {
       steps {
         script {
           withSonarQubeEnv('buy-01') {
@@ -28,8 +30,7 @@ pipeline {
             }
         }
       }
-  }
-  stages {
+    }
     stage('Run Tests: User Service') {
       agent { label 'master' }
       steps {
