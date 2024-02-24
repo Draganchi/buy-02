@@ -29,7 +29,7 @@ failure in the pipeline, so it doesn't make it into production.
 
 #### Prerequisites
 
-- Access to the [**SonarQube dashboard**](http://64.226.78.45:9000)
+- Access to the [**SonarQube dashboard**](http://146.190.63.24/:9000)
 
 #### SonarQube
 
@@ -43,7 +43,7 @@ duplicated lines and test coverage.
 #### Infrastructure
 
 SonarQube is running on a Digital Ocean droplet. For this entire project
-(buy-01, Jenkins and SonarQube) we have three separate droplets set up.
+(buy-01, Jenkins and SonarQube) we have two separate droplets set up.
 
 ## MR-JENK
 
@@ -53,14 +53,13 @@ Mr-jenk is the fourth project in the java track of 01Edu's curriculum. The goal
 of the project is to create a CI/CD pipeline for the
 [**buy-01**] project we created earlier.
 The project uses Jenkins, JUnit, Karma, Jasmine, Github webhooks and Docker to
-fully automate the process of testing and deploying the code to
-[**production environment.**](https://thewarehouse.rocks)
+fully automate the process of testing and deploying the code
 
 #### Prerequisites
 
 To run and view the project you'll need:
 
-- Access to the [**Jenkins dashboard**](http://164.90.167.77:8080)
+- Access to the [**Jenkins dashboard**](http://147.182.253.79/:8080)
 - Access to the repository, to push changes to main branch
 
 #### Running the project
