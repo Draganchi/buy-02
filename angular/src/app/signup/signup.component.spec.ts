@@ -29,7 +29,7 @@ describe('SignupComponent', () => {
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     stateService = TestBed.inject(StateService);
-    //router = TestBed.inject(Router);
+    router = TestBed.inject(Router);
 
  // beforeEach(() => {
     // Correct mock for UserService
@@ -50,7 +50,6 @@ describe('SignupComponent', () => {
     }));
 
     spyOn(stateService, 'refreshState').and.callThrough();
-  });
   });
 
   it('should create', () => {
@@ -100,6 +99,6 @@ describe('SignupComponent', () => {
     // Verify navigation
     expect(routerSpy).toHaveBeenCalledWith(['home'], jasmine.any(Object));
   });
-});
+//});
 
 
