@@ -56,6 +56,7 @@ public class UserService {
   @Value("${admin.email}")
   private String adminEmail;
 
+  
   public List<User> getAllUsers(String name) {
     List<User> users = new ArrayList<>();
     if (name == null) {
@@ -177,5 +178,10 @@ public class UserService {
         new User(adminUsername, adminEmail, passwordEncoder.encode(adminPassword), Role.ADMIN);
 
     userRepository.save(adminUser);
+  }
+
+  @Deprecated
+  public void deleteAllUsers() {
+    userRepository.deleteAll();
   }
 }
