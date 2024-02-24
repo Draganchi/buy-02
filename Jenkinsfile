@@ -60,7 +60,7 @@ pipeline {
                 -Dsonar.projectKey=buy-01-user-service \
                 -Dsonar.host.url=http://146.190.63.24:9000 \
                 -Dsonar.token=squ_a45b7b014af2b8b9b1a6cdbf4b88eb8e0db59b82
-                """
+               '''
               }
             }
             timeout(time: 1, unit: 'HOURS') {
