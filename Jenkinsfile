@@ -8,6 +8,27 @@ pipeline {
     PROJECT_NAME = 'buy01'
     // PROJECT_VERSION will be dynamically set within a stage
   }
+  stage('SonarQube Analysis') {
+      steps {
+        script {
+          withSonarQubeEnv('buy-01') {
+            sh """
+              mvn clean verify sonar:sonar \
+              -Dsonar.projectKey=buy-01 \
+              -Dsonar.projectName='buy-01' \
+              -Dsonar.host.url=http://146.190.63.24:9000 \
+              -Dsonar.token=sqp_8a21ff18b5342262aed0b3acb0280ee995941475
+            """
+          }
+          timeout(time: 1, unit: 'HOURS') {
+              def qg = waitForQualityGate()
+              if (qg.status != 'OK') {
+                  error "Pipeline aborted due to quality gate failure: ${qg.status}"
+              }
+            }
+        }
+      }
+  }
   stages {
     stage('Run Tests: User Service') {
       agent { label 'master' }
@@ -51,27 +72,7 @@ pipeline {
         }
       }
     }
-    stage('SonarQube Analysis') {
-      steps {
-        script {
-          withSonarQubeEnv('buy-01') {
-            sh """
-              mvn clean verify sonar:sonar \
-              -Dsonar.projectKey=buy-01 \
-              -Dsonar.projectName='buy-01' \
-              -Dsonar.host.url=http://146.190.63.24:9000 \
-              -Dsonar.token=sqp_8a21ff18b5342262aed0b3acb0280ee995941475
-            """
-          }
-          timeout(time: 1, unit: 'HOURS') {
-              def qg = waitForQualityGate()
-              if (qg.status != 'OK') {
-                  error "Pipeline aborted due to quality gate failure: ${qg.status}"
-              }
-            }
-        }
-      }
-    }
+    
     stage('Extract Version') {
       steps {
         script {
