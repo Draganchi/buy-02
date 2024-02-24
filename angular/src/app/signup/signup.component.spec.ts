@@ -1,104 +1,257 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
 import { SignupComponent } from './signup.component';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { UserService } from '../service/user.service';
-import { StateService } from '../service/state.service';
-import { Router } from '@angular/router';
 import { of } from 'rxjs';
+import { CheckboxModule } from 'primeng/checkbox';
+import { UserService } from '../service/user.service';
+import { AuthService } from '../service/auth.service';
+import { User } from '../interfaces/user';
 
 describe('SignupComponent', () => {
   let component: SignupComponent;
   let fixture: ComponentFixture<SignupComponent>;
-  let userService: UserService;
-  let stateService: StateService;
-  let router: Router;
+  const userServiceMock = {
+    sendSignupRequest: () =>
+      of({
+        name: 'taneli',
+        email: 'taneli@gmail.com',
+        confirmPassword: 'test123',
+        role: 'SELLER',
+        id: '123123123',
+      }),
+    sendLoginRequest: () =>
+      of({
+        name: 'taneli',
+        role: 'SELLER',
+      }),
+  };
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  beforeEach(() => {
+    TestBed.configureTestingModule({
       declarations: [SignupComponent],
-      imports: [ReactiveFormsModule, RouterTestingModule, HttpClientTestingModule],
+      imports: [CheckboxModule, ReactiveFormsModule],
       providers: [
-        { provide: UserService, useValue: jasmine.createSpyObj('UserService', ['sendSignupRequest', 'sendLoginRequest']) },
-        { provide: StateService, useValue: jasmine.createSpyObj('StateService', ['refreshState']) }
-      ]
-    }).compileComponents();
-
+        {
+          provide: ActivatedRoute,
+          useValue: { paramMap: of({ get: () => 'register' }) },
+        },
+        {
+          provide: UserService,
+          useValue: userServiceMock,
+        },
+        {
+          provide: Router,
+          useValue: {
+            navigate: jasmine.createSpy('navigate'),
+          },
+        },
+        {
+          provide: AuthService,
+          useValue: {
+            getAuth: () => {
+              of({
+                name: 'taneli',
+                email: 'taneli@taneli.com',
+                id: '123123123123123',
+                role: 'SELLER',
+              });
+            },
+          },
+        },
+      ],
+    });
     fixture = TestBed.createComponent(SignupComponent);
     component = fixture.componentInstance;
-    userService = TestBed.inject(UserService);
-    stateService = TestBed.inject(StateService);
-    router = TestBed.inject(Router);
-
-    // Correct mock for UserService
-    spyOn(userService, 'sendSignupRequest').and.returnValue(of({
-      name: 'Test User',
-      email: 'test@example.com',
-      password: 'testPassword',
-      id: '1',
-      role: 'CLIENT',
-    }));
-
-    // Correct mock for UserService's login method
-    spyOn(userService, 'sendLoginRequest').and.returnValue(of({
-      name: 'Test User',
-      email: 'test@example.com',
-      id: '1',
-      role: 'CLIENT'
-    }));
-
-    spyOn(stateService, 'refreshState').and.callThrough();
+    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('form should be invalid when empty', () => {
-    expect(component.registerForm.valid).toBeFalsy();
+  it('should initialize variables', () => {
+    expect(component.formValid).toEqual(false);
   });
 
-  it('form should be valid when filled out correctly', () => {
-    component.registerForm.controls['name'].setValue('Test User');
-    component.registerForm.controls['email'].setValue('test@example.com');
-    component.registerForm.controls['password'].setValue('password123');
-    component.registerForm.controls['confirmPassword'].setValue('password123');
-    component.registerForm.controls['role'].setValue(false); // Assuming false maps to 'CLIENT'
+  it('should validate correct form', () => {
+    component.registerForm.setValue({
+      name: 'taneli',
+      email: 'email@gmail.com',
+      password: 'test123',
+      confirmPassword: 'test123',
+      role: 'CLIENT',
+    });
+
     component.onValidate();
-    expect(component.formValid).toBeTrue();
+    expect(component.formValid).toEqual(true);
   });
 
-  it('should submit form and auto-login', () => {
-    const signupRequest = {
-      name: 'Test User',
-      email: 'test@example.com',
-      password: 'password123',
-      confirmPassword: 'password123',
-      role: false // Assuming false maps to 'CLIENT'
-    };
+  it('should call onSubmit and navigate to home page on successfull signup', () => {
+    const userService = TestBed.inject(UserService);
+    const router = TestBed.inject(Router);
 
-    // Set form values
-    component.registerForm.controls['name'].setValue(signupRequest.name);
-    component.registerForm.controls['email'].setValue(signupRequest.email);
-    component.registerForm.controls['password'].setValue(signupRequest.password);
-    component.registerForm.controls['confirmPassword'].setValue(signupRequest.confirmPassword);
-    component.registerForm.controls['role'].setValue(signupRequest.role);
+    component.registerForm.setValue({
+      name: 'taneli',
+      email: 'email@gmail.com',
+      password: 'test123',
+      confirmPassword: 'test123',
+      role: 'CLIENT',
+    });
 
-    // Spy on the StateService and Router methods
-    const stateServiceSpy = spyOn(stateService, 'refreshState').and.callThrough();
-    const routerSpy = spyOn(router, 'navigate');
+    spyOn(userService, 'sendSignupRequest').and.returnValue(
+      of({
+        name: 'taneli',
+        email: 'email@gmail.com',
+        role: 'SELLER',
+        jwtToken: '123123123',
+        id: '123123123',
+      } as User),
+    );
+
+    component.registerForm.setValue({
+      name: 'taneli',
+      email: 'taneli@gmail.com',
+      password: 'test123',
+      confirmPassword: 'test123',
+      role: true,
+    });
 
     component.onSubmit();
 
-    // Verify service calls
-    expect(userService.sendSignupRequest).toHaveBeenCalledWith(jasmine.objectContaining({ role: 'CLIENT' }));
-    expect(userService.sendLoginRequest).toHaveBeenCalledWith(jasmine.objectContaining({ role: 'CLIENT' }));
+    expect(userService.sendSignupRequest).toHaveBeenCalledWith({
+      name: 'taneli',
+      email: 'taneli@gmail.com',
+      password: 'test123',
+      confirmPassword: 'test123',
+      role: 'SELLER',
+    });
 
-    // Verify navigation
-    expect(routerSpy).toHaveBeenCalledWith(['home'], jasmine.any(Object));
+    component.autoLogin({
+      name: 'taneli',
+      email: 'taneli@gmail.com',
+      password: 'test123',
+      role: 'SELLER',
+    });
+
+    expect(router.navigate).toHaveBeenCalledWith(['home'], {
+      state: {
+        data: {
+          name: 'taneli',
+          role: 'SELLER',
+        },
+      },
+    });
   });
 
+  it('should not validate: passwords don\'t match', () => {
+    component.registerForm.setValue({
+      name: 'taneli',
+      email: 'email@gmail.com',
+      password: 'test12',
+      confirmPassword: 'test123',
+      role: 'CLIENT',
+    });
+
+    component.onValidate();
+    expect(component.formValid).toEqual(false);
+  });
+
+  it('should not validate: invalid email', () => {
+    component.registerForm.setValue({
+      name: 'taneli',
+      email: 'email',
+      password: 'test123',
+      confirmPassword: 'test123',
+      role: 'CLIENT',
+    });
+
+    component.onValidate();
+    expect(component.formValid).toEqual(false);
+  });
+
+  it('should not validate: short name', () => {
+    component.registerForm.setValue({
+      name: 't',
+      email: 'email@gmail.com',
+      password: 'test123',
+      confirmPassword: 'test123',
+      role: 'CLIENT',
+    });
+
+    component.onValidate();
+    expect(component.formValid).toEqual(false);
+  });
+
+  it('should not validate: long name', () => {
+    component.registerForm.setValue({
+      name:
+        'tajsdklajsdkljaskldjaklsdjasldlasldpwoqeiweopiqwopeipqowieopqwiepoqwieopiqwepoiqwpoei',
+      email: 'email@gmail.com',
+      password: 'test123',
+      confirmPassword: 'test123',
+      role: 'CLIENT',
+    });
+
+    component.onValidate();
+    expect(component.formValid).toEqual(false);
+  });
+
+  it('should set role as \'CLIENT\'', () => {
+    const userService = TestBed.inject(UserService);
+    component.registerForm.setValue({
+      name: 'test',
+      email: 'email@gmail.com',
+      password: 'test123',
+      confirmPassword: 'test123',
+      role: false,
+    });
+
+    spyOn(userService, 'sendSignupRequest').and.returnValue(
+      of({
+        name: 'test',
+        email: 'email@gmail.com',
+        role: 'CLIENT',
+      } as User),
+    );
+
+    component.onSubmit();
+    expect(userService.sendSignupRequest).toHaveBeenCalledWith({
+      name: 'test',
+      email: 'email@gmail.com',
+      password: 'test123',
+      confirmPassword: 'test123',
+      role: 'CLIENT',
+    });
+  });
+
+  it('should set role as \'SELLER\'', () => {
+    const userService = TestBed.inject(UserService);
+    component.registerForm.setValue({
+      name: 'seller',
+      email: 'email@gmail.com',
+      password: 'test123',
+      confirmPassword: 'test123',
+      role: true,
+    });
+
+    spyOn(userService, 'sendSignupRequest').and.returnValue(
+      of({
+        name: 'seller',
+        email: 'email@gmail.com',
+        role: 'SELLER',
+      } as User),
+    );
+
+    component.onSubmit();
+    expect(userService.sendSignupRequest).toHaveBeenCalledWith({
+      name: 'seller',
+      email: 'email@gmail.com',
+      password: 'test123',
+      confirmPassword: 'test123',
+      role: 'SELLER',
+    });
+  });
 });
 
 
