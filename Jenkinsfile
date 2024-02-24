@@ -56,7 +56,7 @@ pipeline {
         script {
           withSonarQubeEnv('buy-01'){
                 sh '''
-                mvn sonar:sonar \
+                mvn clean verify sonar:sonar \
                 -Dsonar.projectKey=buy-01 \
                 -Dsonar.projectName='buy-01' \
                 -Dsonar.host.url=http://146.190.63.24:9000 \
