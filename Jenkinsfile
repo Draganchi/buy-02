@@ -63,7 +63,6 @@ pipeline {
                 -Dsonar.token=sqp_8a21ff18b5342262aed0b3acb0280ee995941475
                '''
               }
-            }
             timeout(time: 1, unit: 'HOURS') {
               waitForQualityGate abortPipeline: true
             }
