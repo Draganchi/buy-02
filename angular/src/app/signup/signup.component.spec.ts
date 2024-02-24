@@ -29,12 +29,11 @@ describe('SignupComponent', () => {
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     stateService = TestBed.inject(StateService);
-    router = TestBed.inject(Router);
+    router = TestBed.inject(Router);
 
- // beforeEach(() => {
     // Correct mock for UserService
-   spyOn(userService, 'sendSignupRequest').and.returnValue(of({
-     name: 'Test User',
+    spyOn(userService, 'sendSignupRequest').and.returnValue(of({
+      name: 'Test User',
       email: 'test@example.com',
       password: 'testPassword',
       id: '1',
@@ -42,11 +41,11 @@ describe('SignupComponent', () => {
     }));
 
     // Correct mock for UserService's login method
-   spyOn(userService, 'sendLoginRequest').and.returnValue(of({
-     name: 'Test User',
-     email: 'test@example.com',
-     id: '1',
-    role: 'CLIENT'
+    spyOn(userService, 'sendLoginRequest').and.returnValue(of({
+      name: 'Test User',
+      email: 'test@example.com',
+      id: '1',
+      role: 'CLIENT'
     }));
 
     spyOn(stateService, 'refreshState').and.callThrough();
