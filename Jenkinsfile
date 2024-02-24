@@ -57,9 +57,10 @@ pipeline {
           withSonarQubeEnv('buy-01'){
                 sh '''
                 mvn sonar:sonar \
-                -Dsonar.projectKey=buy-01-user-service \
+                -Dsonar.projectKey=buy-01 \
+                -Dsonar.projectName='buy-01' \
                 -Dsonar.host.url=http://146.190.63.24:9000 \
-                -Dsonar.token=squ_a45b7b014af2b8b9b1a6cdbf4b88eb8e0db59b82
+                -Dsonar.token=sqp_8a21ff18b5342262aed0b3acb0280ee995941475
                '''
               }
             }
