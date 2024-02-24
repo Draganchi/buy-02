@@ -99,6 +99,7 @@ describe('SignupComponent', () => {
     // Verify navigation
     expect(routerSpy).toHaveBeenCalledWith(['home'], jasmine.any(Object));
   });
-//});
+
+});
 
 
