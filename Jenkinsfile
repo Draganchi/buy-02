@@ -82,7 +82,22 @@ pipeline {
         }
       }
     }
-  }
+     stage('Deploy to Production') {
+            steps {
+                script {
+                    ansiblePlaybook(
+                      colorized: true,
+                      credentialsId: 'deployssh',
+                      disableHostKeyChecking: true,
+                      installation: 'Ansible',
+                      inventory: '/etc/ansible',
+                      playbook: './playbook.yml',
+                      vaultTmpPath: ''
+                  )
+                }
+            }
+        }
+    }
   post {
     success {
       mail to: 'dragana.jenkins.2024@gmail.com',
