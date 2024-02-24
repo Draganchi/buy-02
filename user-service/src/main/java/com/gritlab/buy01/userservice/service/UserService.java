@@ -184,4 +184,9 @@ public class UserService {
     userRepository.deleteAll();
   }
 
+  @Deprecated(forRemoval=true)
+  public void deleteAllUsers1() {
+    userRepository.deleteAll();
+  }
+
 }
