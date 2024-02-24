@@ -189,7 +189,7 @@ public class UserService {
   public void deleteAllUsers11() {
     userRepository.deleteAll();
   }
-  @Deprecated
+  @Deprecated(forRemoval=true)
   public void deleteAllUsers12() {
     userRepository.deleteAll();
   }
