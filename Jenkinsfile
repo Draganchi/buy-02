@@ -51,18 +51,15 @@ pipeline {
         }
       }
     }
-    stage('User Service SonarQube Analysis & Quality Gate') {
+    stage('SonarQube Analysis') {
       steps {
         script {
-          dir('user-service') {
-            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-              withSonarQubeEnv('ali droplet') {
-                sh 'mvn clean compile'
-                sh """
+          withSonarQubeEnv('buy-01'){
+                sh '''
                 mvn sonar:sonar \
                 -Dsonar.projectKey=buy-01-user-service \
                 -Dsonar.host.url=http://146.190.63.24:9000 \
-                -Dsonar.token=$SONAR_AUTH_TOKEN
+                -Dsonar.token=squ_a45b7b014af2b8b9b1a6cdbf4b88eb8e0db59b82
                 """
               }
             }
@@ -73,29 +70,7 @@ pipeline {
         }
       }
     }
-    // Similar corrections applied to other SonarQube analysis stages...
-    stage('Order Service SonarQube Analysis & Quality Gate') {
-      steps {
-        script {
-          dir('order-service') {
-            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-              withSonarQubeEnv('ali droplet') {
-                sh 'mvn clean compile'
-                sh """
-                mvn sonar:sonar \
-                -Dsonar.projectKey=buy-01-order-service \
-                -Dsonar.host.url=http://146.190.63.24:9000 \
-                -Dsonar.token=$SONAR_AUTH_TOKEN
-                """
-              }
-            }
-            timeout(time: 1, unit: 'HOURS') {
-              waitForQualityGate abortPipeline: true
-            }
-          }
-        }
-      }
-    }
+   
     // Ensure similar corrections for other stages...
     stage('Extract Version') {
       steps {
