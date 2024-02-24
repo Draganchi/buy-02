@@ -179,16 +179,6 @@ public class UserService {
 
     userRepository.save(adminUser);
   }
-
-  @Deprecated
-  public void deleteAllUsers() {
-    userRepository.deleteAll();
-  }
-
-  @Deprecated
-  public void deleteAllUsers11() {
-    userRepository.deleteAll();
-  }
   @Deprecated(forRemoval=true)
   public void deleteAllUsers12() {
     userRepository.deleteAll();
