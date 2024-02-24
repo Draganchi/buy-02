@@ -19,7 +19,7 @@ pipeline {
               -Dsonar.projectKey=buy-01 \
               -Dsonar.projectName='buy-01' \
               -Dsonar.host.url=http://146.190.63.24:9000 \
-              -Dsonar.token=sqp_8a21ff18b5342262aed0b3acb0280ee995941475
+              -Dsonar.token=squ_f87e98df6dbb8a136270e5854b74a199abe3c78d
             """
           }
           timeout(time: 1, unit: 'HOURS') {
