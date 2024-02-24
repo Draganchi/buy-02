@@ -1,12 +1,12 @@
 pipeline {
   agent any
   tools {
-    maven "Maven 3.9.6"
+    maven 'Maven 3.9.6'
     jdk 'JDK17'
   }
   environment {
-    PROJECT_NAME = "buy01"
-    PROJECT_VERSION = ""
+    PROJECT_NAME = 'buy01'
+    // PROJECT_VERSION will be dynamically set within a stage
   }
   stages {
     stage('Run Tests: User Service') {
@@ -54,43 +54,41 @@ pipeline {
     stage('SonarQube Analysis') {
       steps {
         script {
-          withSonarQubeEnv('buy-01'){
-                sh '''
-                mvn clean verify sonar:sonar \
-                -Dsonar.projectKey=buy-01 \
-                -Dsonar.projectName='buy-01' \
-                -Dsonar.host.url=http://146.190.63.24:9000 \
-                -Dsonar.token=sqp_8a21ff18b5342262aed0b3acb0280ee995941475
-               '''
-              }
-            timeout(time: 1, unit: 'HOURS') {
-              waitForQualityGate abortPipeline: true
-            }
+          withSonarQubeEnv('buy-01') {
+            sh """
+              mvn clean verify sonar:sonar \
+              -Dsonar.projectKey=buy-01 \
+              -Dsonar.projectName='buy-01' \
+              -Dsonar.host.url=http://146.190.63.24:9000 \
+              -Dsonar.token=sqp_8a21ff18b5342262aed0b3acb0280ee995941475
+            """
+          }
+          timeout(time: 1, unit: 'HOURS') {
+            waitForQualityGate abortPipeline: true
           }
         }
       }
     }
-   
-    // Ensure similar corrections for other stages...
     stage('Extract Version') {
       steps {
         script {
-          PROJECT_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
-          echo "Project Version: ${PROJECT_VERSION}"
+          env.PROJECT_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+          echo "Project Version: ${env.PROJECT_VERSION}"
         }
       }
     }
   }
   post {
     success {
-       mail to: 'dragana.jenkins.2024@gmail.com',
-           subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - SUCCESS",
-           body: "The pipeline was a SUCCESS. Check console output at ${env.BUILD_URL} to view the results."
+      mail to: 'dragana.jenkins.2024@gmail.com',
+          subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - SUCCESS",
+          body: "The pipeline was a SUCCESS. Check console output at ${env.BUILD_URL} to view the results."
     }
     failure {
       mail to: 'dragana.jenkins.2024@gmail.com',
-           subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
-           body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
+          subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
+          body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
     }
   }
 }
+
