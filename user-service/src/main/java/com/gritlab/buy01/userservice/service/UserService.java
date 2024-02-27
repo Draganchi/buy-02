@@ -179,21 +179,4 @@ public class UserService {
 
     userRepository.save(adminUser);
   }
-
-  @Deprecated(since = "0.0.1", forRemoval = true)
-  public ResponseEntity<?> deleteUser(String id, boolean isSelf) {
-    Optional<User> user = userRepository.findById(id);
-    if
-    (user.isPresent()) {
-      eventPublisher.publishEvent(new UserDeletionEvent(this, user.get()));
-      userRepository.deleteById(id);
-      if (isSelf) {
-        return ResponseEntity.ok(new MessageResponse("User deleted successfully!"));
-      } else {
-        return ResponseEntity.ok(new MessageResponse("User deleted successfully!"));
-      }
-    } else {
-      return ResponseEntity.notFound().build();
-    }
-  }
 }
