@@ -15,7 +15,7 @@ export class ShoppingCartComponent implements OnInit {
   cartItems$: Observable<CartItem[]> = of([]);
   errorMessages: Set<string> = new Set();
   problematicOrderIds: Set<string> = new Set();
-  currentUser: User = {} as User;
+  currentUser: User = {} as User; //An observable for the current user's data, fetched from stateService.
   user$: Observable<User> | null = null;
   empty = true;
 

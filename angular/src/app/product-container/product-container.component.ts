@@ -31,7 +31,7 @@ export class ProductContainerComponent implements OnInit, OnChanges {
   @ViewChild('productDialog')
     productDialog: ElementRef | undefined;
 
-  products$: Observable<Product[]> | null = null;
+  products$: Observable<Product[]> | null = null;//An Observable stream of products fetched from the ProductService
   dashboard = true;
   showProductForm = false;
   showAddButton = false;

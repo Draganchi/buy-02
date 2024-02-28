@@ -35,9 +35,10 @@ public class KafkaService {
   private static final String PRODUCT_ORDER_CANCELLATION_MESSAGE = "product-order-cancellation";
   private static final long TOKEN_CACHE_DURATION = TimeUnit.MINUTES.toMillis(5);
 
+  //Used for producing messages to Kafka topics.
   @Qualifier("kafkaTemplate")
   private final KafkaTemplate<String, TokenValidationRequest> kafkaTemplate;
-
+ 
   @Qualifier("cartValidationKafkaTemplate")
   private final KafkaTemplate<String, CartValidationRequest> cartValidationKafkaTemplate;
 
@@ -103,7 +104,7 @@ public class KafkaService {
       return null;
     }
   }
-
+  //Used for consuming messages from Kafka topics.
   @KafkaListener(topics = TOPIC_RESPONSE, groupId = "order-service-group")
   public void consumeTokenValidationResponse(TokenValidationResponse response) {
     BlockingQueue<TokenValidationResponse> queue = responseQueues.get(response.getCorrelationId());
