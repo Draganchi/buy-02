@@ -171,10 +171,5 @@ public class OrderService {
 
     return orderRepository.save(order);
   }
-  @Deprecated(since = "0.0.1", forRemoval = true)
-  public Order changeOrderStatus(OrderStatusUpdate update, String userId)
-      throws NotFoundException, ForbiddenException {
-    return changeOrderStatus(update, userId, "ROLE_CLIENT");
-  }
-  
+
 }
